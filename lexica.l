@@ -33,9 +33,23 @@ ID {LETRA}({LETRA}|{NUM})*
 
 [+\-*/=]	{ return *yytext; }
 
-{NUM}		{ yylval.label = yytext; return TK_NUM; }
-{ID}		{ yylval.label = yytext; return TK_ID; }
-{REAL}      { yylval.label = yytext; return TK_REAL;}
+">"         { return *yytext;}
+
+"<"        { return *yytext;}
+
+">="       { return *yytext;}
+
+"<="        { return *yytext; }
+
+"=="       { return *yytext;  }
+
+
+"!="       { return *yytext;  }
+
+{NUM}		{ yylval.label = yytext; return TK_NUM;  }
+{ID}		{ yylval.label = yytext; return TK_ID;   }
+{REAL}      { yylval.label = yytext; return TK_REAL; }
+{CHAR}      { yylval.label = yytext; return TK_CHAR; }
 
 .			{ *yytext; }
 

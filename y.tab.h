@@ -47,27 +47,43 @@ extern int yydebug;
   {
     TK_NUM = 258,
     TK_REAL = 259,
-    TK_MAIN = 260,
-    TK_ID = 261,
-    TK_TIPO_INT = 262,
-    TK_TIPO_FLOAT = 263,
-    TK_TIPO_CHAR = 264,
-    TK_TIPO_BOOL = 265,
-    TK_FIM = 266,
-    TK_ERROR = 267
+    TK_CHAR = 260,
+    TK_BOOL = 261,
+    TK_MAIN = 262,
+    TK_ID = 263,
+    TK_TIPO_INT = 264,
+    TK_TIPO_FLOAT = 265,
+    TK_TIPO_CHAR = 266,
+    TK_TIPO_BOOL = 267,
+    TK_FIM = 268,
+    TK_ERROR = 269,
+    TK_IGUAL = 270,
+    TK_GTE = 271,
+    TK_LTE = 272,
+    TK_DIFERENTE = 273,
+    TK_MAIOR = 274,
+    TK_MENOR = 275
   };
 #endif
 /* Tokens.  */
 #define TK_NUM 258
 #define TK_REAL 259
-#define TK_MAIN 260
-#define TK_ID 261
-#define TK_TIPO_INT 262
-#define TK_TIPO_FLOAT 263
-#define TK_TIPO_CHAR 264
-#define TK_TIPO_BOOL 265
-#define TK_FIM 266
-#define TK_ERROR 267
+#define TK_CHAR 260
+#define TK_BOOL 261
+#define TK_MAIN 262
+#define TK_ID 263
+#define TK_TIPO_INT 264
+#define TK_TIPO_FLOAT 265
+#define TK_TIPO_CHAR 266
+#define TK_TIPO_BOOL 267
+#define TK_FIM 268
+#define TK_ERROR 269
+#define TK_IGUAL 270
+#define TK_GTE 271
+#define TK_LTE 272
+#define TK_DIFERENTE 273
+#define TK_MAIOR 274
+#define TK_MENOR 275
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
