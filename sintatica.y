@@ -9,7 +9,7 @@ using namespace std;
 
 string getVarType(int);
 int checkType(int, int);
-
+string convertRelacional(int, string, int, string);
 int curVar = 0;
 string getVarName(){
 	return "temp" + to_string(++curVar);
@@ -34,9 +34,11 @@ int yylex(void);
 void yyerror(string);
 %}
 
-%token TK_NUM TK_REAL
+%token TK_NUM TK_REAL TK_CHAR TK_BOOL
 %token TK_MAIN TK_ID TK_TIPO_INT TK_TIPO_FLOAT TK_TIPO_CHAR TK_TIPO_BOOL
 %token TK_FIM TK_ERROR
+%token TK_EQUAL TK_GTE TK_LTE TK_NEQUAL TK_MAIOR TK_MENOR
+%token TK_AND TK_OR TK_NOT
 
 %start S
 %left ')'
@@ -50,7 +52,7 @@ void yyerror(string);
 
 S 			: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
 			{
-				cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include<string.h>\n#include<stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl;
+				cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include <string.h>\n#include <stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl;
 			}
 			;
 
@@ -111,24 +113,53 @@ E 			: '('E')'{
 				$$.traducao = $1.traducao + $3.traducao + "\t"+getVarType($$.tipo)+ " " +  varName +" = "+ $1.label +" / "+ $3.label +";\n";
 				$$.label = varName;
 			}
-
-			//Atribuição
-			| E '=' E
-			{
-				string varName = getVarName();
-				$$.traducao = $1.traducao + $3.traducao + "\t"+ varName +" = "+ $1.label +" = "+ $3.label +";\n";
-				// $$.traducao = $1.traducao + $3.traducao;
-				$$.label = varName;
-			}
-
-
 			| E '>' E
 			{
-				bool basaur = false;
+				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
+				string varName = getVarName();
+				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+ "bool " + varName +" = "+ $1.label +" > "+ $3.label +";\n";
+				$$.label = varName;
+			}
+			| E '<' E
+			{
+				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
+				string varName = getVarName();
+				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+ "bool " + varName +" = "+ $1.label +" < "+ $3.label +";\n";
+				$$.label = varName;
+			}
+			| E TK_GTE E
+			{
+				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
+				string varName = getVarName();
+				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+ "bool " + varName +" = "+ $1.label +" >= "+ $3.label +";\n";
+				$$.label = varName;
+			}
+			| E TK_LTE E
+			{
+				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
+				string varName = getVarName();
+				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+ "bool " + varName +" = "+ $1.label +" <= "+ $3.label +";\n";
+				$$.label = varName;
+			}
+			| E TK_EQUAL E
+			{
+				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
+				string varName = getVarName();
+				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+ "bool " + varName +" = "+ $1.label +" == "+ $3.label +";\n";
+				$$.label = varName;
+			}
+			| E TK_NEQUAL E
+			{
+				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
+				string varName = getVarName();
+				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+ "bool " + varName +" = "+ $1.label +" != "+ $3.label +";\n";
+				$$.label = varName;
+			}
+			| E TK_AND E
+			{
 				$$.tipo = checkType($1.tipo, $3.tipo);
 				string varName = getVarName();
-				$$.traducao = $1.traducao + $3.traducao + "\t"+ varName +" = "+ $1.label +" > "+ $3.label +";\n";
-				// $$.traducao = $1.traducao + $3.traducao;
+				$$.traducao = $1.traducao + $3.traducao + "\t"+getVarType($$.tipo)+ " " +  varName +" = "+ $1.label +" && "+ $3.label +";\n";
 				$$.label = varName;
 			}
 			| TK_REAL
@@ -142,6 +173,14 @@ E 			: '('E')'{
 			{
 				$$.tipo = TK_NUM;
 				string varName = getVarName();
+				$$.traducao = "\t"+ getVarType($$.tipo) + " "+varName+ " = " + $1.label + ";\n";
+				$$.label = varName;
+			}
+			| TK_BOOL
+			{
+				$$.tipo = TK_BOOL;
+				string varName = getVarName();
+				puts("Estou aqui");
 				$$.traducao = "\t"+ getVarType($$.tipo) + " "+varName+ " = " + $1.label + ";\n";
 				$$.label = varName;
 			}
@@ -178,14 +217,18 @@ string getVarType(int type){
 		return "float";
 	if(type == TK_TIPO_CHAR)
 		return "char";
-	if(type == TK_TIPO_BOOL)
+	if(type == TK_BOOL)
 		return "bool";
 }
 
 int checkType (int t1, int t3){
-	if ( (t1!= TK_NUM && t1 != TK_REAL) || (t3 != TK_NUM && t3 != TK_REAL) ) {
-		puts("ERROR");
-		return -1;
+	if ( (t1 != TK_NUM && t1 != TK_REAL) || (t3 != TK_NUM && t3 != TK_REAL) ) {
+
+		if (t1 == TK_BOOL && t3 == TK_BOOL)
+			return TK_BOOL;
+
+		puts("Invalid Type for the Operation");
+		exit(0);
 	}
 	else if (t1 == TK_REAL || t3 == TK_REAL){
 
@@ -196,4 +239,20 @@ int checkType (int t1, int t3){
 
 		return TK_NUM;
 	}
+}
+
+string convertRelacional(int t1, string t1_label, int t3, string t3_label){
+	int teste = checkType(t1, t3);
+	string toFloat = "", linha = "";
+	if (teste == TK_REAL){
+		if(t1 == TK_NUM){
+			toFloat = t1_label;
+			linha = "\tfloat " + getVarName() + " = " + toFloat +";\n";
+		}
+		else if (t3 == TK_NUM){
+			toFloat = t3_label;
+			linha = "\tfloat " + getVarName() + " = " + toFloat +";\n";
+		}
+	}
+
 }
