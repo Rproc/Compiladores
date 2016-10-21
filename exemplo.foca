@@ -1,5 +1,4 @@
 int main()
 {
-	  true ;
-
+	bool a, b, c, d, e, f;
 }

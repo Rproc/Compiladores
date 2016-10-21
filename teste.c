@@ -1,12 +1,12 @@
 #include <stdio.h>
+#include <math.h>
+#include <iostream>
+
+using namespace std;
 
 int main(int argc, char const *argv[]) {
-    int a = 8;
-    float b = 8.0;
 
-    if (a == b)
-        puts("deu");
-    else
-        puts("deu tbm");
-    return 0;
-}
+    bool a = 5 + 2 == 7;
+
+    cout << a << endl;
+ }

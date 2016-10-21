@@ -45,7 +45,7 @@ void yyerror(string);
 %left '+' '-'
 %left '*' '/'
 %left '('
-%right '^'
+%right '^' '<' '>' TK_GTE TK_LTE TK_NEQUAL TK_EQUAL TK_NOT
 
 %%
 
@@ -69,8 +69,53 @@ COMANDOS	: COMANDO COMANDOS
 			;
 
 COMANDO 	: E ';'
+			| DECLARATION ';'
+			{
+				$$ = $1;
+			}
 			;
 
+DECLARATION : TYPE VARLIST
+			{
+				$$.traducao = $1.traducao + $2.traducao;
+				$2.tipo = $1.tipo;
+			}
+			;
+
+TYPE		: TK_TIPO_INT
+			{
+				$$.tipo = TK_TIPO_INT;
+				$$.traducao = $1.traducao;
+			}
+			| TK_TIPO_FLOAT
+			{
+				$$.tipo = TK_TIPO_FLOAT;
+				$$.traducao = $1.traducao;
+			}
+			| TK_TIPO_CHAR
+			{
+				$$.tipo = TK_TIPO_CHAR;
+				$$.traducao = $1.traducao;
+			}
+			| TK_TIPO_BOOL
+			{
+				$$.tipo = TK_TIPO_BOOL;
+				$$.traducao = $1.traducao;
+			}
+			;
+VARLIST		: VARLIST ',' TK_ID
+			{
+				// $$.tipo = getVarType();
+				$$.traducao = $1.traducao + $3.traducao +"\t" + getVarType($0.tipo) + " "+ $3.label + "; \n";
+			}
+			|TK_ID
+			{
+				// COLOCAR no HASH
+				// string varName = getVarName();
+				$$.label = $1.label;
+				$$.traducao = $1.traducao + "\t" + getVarType($0.tipo)+ " "+ $1.label + "; \n";
+			}
+			;
 E 			: '('E')'{
 
 				$$ = $2;
@@ -122,7 +167,7 @@ E 			: '('E')'{
 			}
 			| E '>' E
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+getVarType($$.tipo)+ " " + varName +" = "+ $1.label +" > "+ $3.label +";\n";
@@ -130,7 +175,7 @@ E 			: '('E')'{
 			}
 			| E '<' E
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+getVarType($$.tipo)+ " " + varName +" = "+ $1.label +" < "+ $3.label +";\n";
@@ -138,7 +183,7 @@ E 			: '('E')'{
 			}
 			| E TK_GTE E
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+getVarType($$.tipo)+ " " + varName +" = "+ $1.label +" >= "+ $3.label +";\n";
@@ -146,7 +191,7 @@ E 			: '('E')'{
 			}
 			| E TK_LTE E
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+getVarType($$.tipo)+ " " + varName +" = "+ $1.label +" <= "+ $3.label +";\n";
@@ -154,7 +199,7 @@ E 			: '('E')'{
 			}
 			| E TK_EQUAL E
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+getVarType($$.tipo)+ " " + varName +" = "+ $1.label +" == "+ $3.label +";\n";
@@ -162,7 +207,7 @@ E 			: '('E')'{
 			}
 			| E TK_NEQUAL E
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+getVarType($$.tipo)+ " " + varName +" = "+ $1.label +" != "+ $3.label +";\n";
@@ -170,7 +215,7 @@ E 			: '('E')'{
 			}
 			| E TK_AND E
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				$$.tipo = checkType($1.tipo, $3.tipo);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + "\t"+getVarType($$.tipo)+ " " +  varName +" = "+ $1.label +" && "+ $3.label +";\n";
@@ -178,7 +223,7 @@ E 			: '('E')'{
 			}
 			| E TK_OR E
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				$$.tipo = checkType($1.tipo, $3.tipo);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + "\t"+getVarType($$.tipo)+ " " +  varName +" = "+ $1.label +" || "+ $3.label +";\n";
@@ -193,21 +238,21 @@ E 			: '('E')'{
 			}
 			| TK_REAL
 			{
-				$$.tipo = TK_REAL;
+				$$.tipo = TK_TIPO_FLOAT;
 				string varName = getVarName();
 				$$.traducao = "\t" + getVarType($$.tipo) + " "+varName+ " = " + $1.label + ";\n";
 				$$.label = varName;
 			}
 			| TK_NUM
 			{
-				$$.tipo = TK_NUM;
+				$$.tipo = TK_TIPO_INT;
 				string varName = getVarName();
 				$$.traducao = "\t"+ getVarType($$.tipo) + " "+varName+ " = " + $1.label + ";\n";
 				$$.label = varName;
 			}
 			| TK_BOOL
 			{
-				$$.tipo = TK_BOOL;
+				$$.tipo = TK_TIPO_BOOL;
 				string varName = getVarName();
 				// puts("Estou aqui");
 				$$.traducao = "\t"+ getVarType($$.tipo) + " "+varName+ " = " + $1.label + ";\n";
@@ -215,8 +260,8 @@ E 			: '('E')'{
 			}
 			| TK_CHAR
 			{
-				puts("Estou aqui");
-				$$.tipo = TK_CHAR;
+				// puts("Estou aqui");
+				$$.tipo = TK_TIPO_CHAR;
 				string varName = getVarName();
 				$$.traducao = "\t" + getVarType($$.tipo) + " " + varName + " = " + $1.label + ";\n";
 				$$.label = varName;
@@ -225,6 +270,9 @@ E 			: '('E')'{
 			| TK_ID
 			{
 				$$.traducao = $1.traducao;
+				//puts("Estou aqui");
+				$$.label = $1.label;
+
 			}
 			;
 
@@ -249,33 +297,33 @@ void yyerror( string MSG )
 }
 
 string getVarType(int type){
-	if(type == TK_NUM)
+	if(type == TK_TIPO_INT)
 		return "int";
-	if(type == TK_REAL )
+	if(type == TK_TIPO_FLOAT )
 		return "float";
-	if(type == TK_CHAR)
+	if(type == TK_TIPO_CHAR)
 		return "char";
-	if(type == TK_BOOL)
+	if(type == TK_TIPO_BOOL)
 		return "bool";
 }
 
 int checkType (int t1, int t3){
-	if ( (t1 != TK_NUM && t1 != TK_REAL) || (t3 != TK_NUM && t3 != TK_REAL) ) {
+	if ( (t1 != TK_TIPO_INT && t1 != TK_TIPO_FLOAT) || (t3 != TK_TIPO_INT && t3 != TK_TIPO_FLOAT) ) {
 
-		if (t1 == TK_BOOL && t3 == TK_BOOL)
-			return TK_BOOL;
+		if (t1 == TK_TIPO_BOOL && t3 == TK_TIPO_BOOL)
+			return TK_TIPO_BOOL;
 
 		puts("Invalid Type for the Operation");
 		exit(0);
 	}
-	else if (t1 == TK_REAL || t3 == TK_REAL){
+	else if (t1 == TK_TIPO_FLOAT || t3 == TK_TIPO_FLOAT){
 
-		return TK_REAL;
+		return TK_TIPO_FLOAT;
 
 	}
 	else{
 
-		return TK_NUM;
+		return TK_TIPO_INT;
 	}
 }
 
