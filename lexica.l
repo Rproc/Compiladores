@@ -32,7 +32,7 @@ ID {LETRA}({LETRA}|{NUM})*
 
 [(){}[\];,]	{ return *yytext; }
 
-[+\-*/=]	{ return *yytext; }
+[+\-*/=\^]	{ return *yytext; }
 
 ">"         { return *yytext;}
 
@@ -56,13 +56,14 @@ ID {LETRA}({LETRA}|{NUM})*
 
 
 
-{NUM}		{ yylval.label = yytext; return TK_NUM;  }
-{ID}		{ yylval.label = yytext; return TK_ID;   }
-{REAL}      { yylval.label = yytext; return TK_REAL; }
-{CHAR}      { yylval.label = yytext; return TK_CHAR; }
-
 "true"      { yylval.label = yytext; return TK_BOOL;  }
 "false"     { yylval.label = yytext; return TK_BOOL;  }
+
+{NUM}		{ yylval.label = yytext; return TK_NUM;  }
+{CHAR}      { yylval.label = yytext; return TK_CHAR; }
+{ID}		{ yylval.label = yytext; return TK_ID;   }
+{REAL}      { yylval.label = yytext; return TK_REAL; }
+
 
 .			{ *yytext; }
 
