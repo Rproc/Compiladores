@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <fstream>
 
 #define YYSTYPE atributos
 
@@ -10,11 +11,14 @@ using namespace std;
 string getVarType(int);
 int checkType(int, int);
 string convertRelacional(int, string, int, string);
+void createLog (string name, string toWrite, bool);
 int curVar = 0;
 string getVarName(){
 	return "temp" + to_string(++curVar);
 }
 
+//falso apaga a porra toda do arquivo, DEIXE TRUE
+bool appendLogFile = true;
 struct atributos
 {
 	string label;
@@ -105,15 +109,18 @@ TYPE		: TK_TIPO_INT
 			;
 VARLIST		: VARLIST ',' TK_ID
 			{
-				// $$.tipo = getVarType();
+				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao +"\t" + getVarType($0.tipo) + " "+ $3.label + "; \n";
+				createLog("Name", getVarType($0.tipo) + " " + $3.label + " - " + varName, appendLogFile);
+
 			}
 			|TK_ID
 			{
 				// COLOCAR no HASH
-				// string varName = getVarName();
+				string varName = getVarName();
 				$$.label = $1.label;
 				$$.traducao = $1.traducao + "\t" + getVarType($0.tipo)+ " "+ $1.label + "; \n";
+				createLog("Name", getVarType($0.tipo) + " "+ $$.label + " - " + varName, appendLogFile);
 			}
 			;
 E 			: '('E')'{
@@ -340,5 +347,26 @@ string convertRelacional(int t1, string t1_label, int t3, string t3_label){
 			linha = "\tfloat " + getVarName() + " = " + toFloat +";\n";
 		}
 	}
+
+}
+
+void createLog (string name, string toWrite, bool append){
+
+	FILE *p_arquivo;
+	//char *nome = "arquivo.txt";
+	string parameter = "w";
+
+	if(append)
+		parameter = "a";
+
+	if((p_arquivo = fopen(name.c_str(), parameter.c_str()) ) == NULL)
+	{
+		printf("\n\nNao foi possivel abrir o arquivo.\n");
+		return;
+	}
+
+	fprintf(p_arquivo,"%s\n", toWrite.c_str());
+
+	fclose(p_arquivo);
 
 }

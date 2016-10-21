@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
 
-using namespace std;
 
 int main(int argc, char const *argv[]) {
 
-    bool a = 5 + 2 == 7;
+    int temp1 = 6;
+    int temp2 = 5;
 
-    cout << a << endl;
+    int temp3 = temp1 > temp2;
+
+    printf("%d\n", temp3);
  }
