@@ -3,22 +3,18 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <map>
+
 
 #define YYSTYPE atributos
 
 using namespace std;
 
-string getVarType(int);
-int checkType(int, int);
-string convertRelacional(int, string, int, string);
-void createLog (string name, string toWrite, bool);
-int curVar = 0;
-string getVarName(){
-	return "temp" + to_string(++curVar);
-}
 
-//falso apaga a porra toda do arquivo, DEIXE TRUE
-bool appendLogFile = true;
+//Variaveis Globais
+bool appendLogFile = true; //falso apaga a porra toda do arquivo, DEIXE TRUE
+int curVar = 0;
+int i = 0;
 struct atributos
 {
 	string label;
@@ -26,16 +22,36 @@ struct atributos
 	int tipo;
 };
 
-struct variavel
+typedef struct variavel
 {
 	string tipo;
 	string nome_var;
+	string nome_temp;
 
-};
+} variavel;
 
 
+
+std::map<string, variavel> varTable;
+
+
+// Functions
+string getTempOnTable(string label);
+string getVarType(int);
+int checkType(int, int);
+string convertRelacional(int, string, int, string);
+void createLog (string name, string toWrite, bool);
+variavel createVar(string, string, string);
 int yylex(void);
 void yyerror(string);
+
+
+string getVarName(){
+	return "temp" + to_string(++curVar);
+}
+
+
+
 %}
 
 %token TK_NUM TK_REAL TK_CHAR TK_BOOL
@@ -49,13 +65,13 @@ void yyerror(string);
 %left '+' '-'
 %left '*' '/'
 %left '('
-%right '^' '<' '>' TK_GTE TK_LTE TK_NEQUAL TK_EQUAL TK_NOT
+%right '^' '<' '>' TK_GTE TK_LTE TK_NEQUAL TK_EQUAL TK_NOT '='
 
 %%
 
 S 			: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
 			{
-				cout << "/*Compilador FOCA*/\n" << "#include <iostream>\n#include <string.h>\n#include <stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl;
+				cout <<"\n\n /*Compilador FOCA*/\n" << "#include <iostream>\n#include <string.h>\n#include <stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl;
 			}
 			;
 
@@ -76,6 +92,15 @@ COMANDO 	: E ';'
 			| DECLARATION ';'
 			{
 				$$ = $1;
+				// puts("declaraocao Estou aqui");
+				i++;
+				std::cout << "Passei em decl (após COM) com i = " << i << std::endl;
+			}
+			| ATRIB ';'
+			{
+				$$ = $1;
+				i++;
+				std::cout << "Passei em ATRIB (após COM) com i = " << i << std::endl;
 			}
 			;
 
@@ -107,22 +132,56 @@ TYPE		: TK_TIPO_INT
 				$$.traducao = $1.traducao;
 			}
 			;
+
 VARLIST		: VARLIST ',' TK_ID
 			{
 				string varName = getVarName();
-				$$.traducao = $1.traducao + $3.traducao +"\t" + getVarType($0.tipo) + " "+ $3.label + "; \n";
+				$$.traducao = $1.traducao + $3.traducao +"\t" + getVarType($0.tipo) + " "+ varName + "; \n";
 				createLog("Name", getVarType($0.tipo) + " " + $3.label + " - " + varName, appendLogFile);
-
+				variavel v = createVar($3.label, getVarType($0.tipo), varName);
+				varTable[v.nome_var] = v;
+			}
+			| VARLIST ',' ATRIB
+			{
+				$$.traducao = $1.traducao + $3.traducao;
+			}
+			| ATRIB
+			{
+				$$.traducao = $1.traducao;
+				i++;
+				std::cout << "Passei em atrib (após VL) com i = " << i << std::endl;
 			}
 			|TK_ID
 			{
 				// COLOCAR no HASH
 				string varName = getVarName();
 				$$.label = $1.label;
-				$$.traducao = $1.traducao + "\t" + getVarType($0.tipo)+ " "+ $1.label + "; \n";
+				$$.traducao = $1.traducao + "\t" + getVarType($0.tipo)+ " "+ varName + "; \n";
 				createLog("Name", getVarType($0.tipo) + " "+ $$.label + " - " + varName, appendLogFile);
+				variavel v = createVar($$.label, getVarType($0.tipo), varName);
+				varTable[v.nome_var] = v;
 			}
 			;
+
+ATRIB 		: TK_ID '=' E
+			{
+				string varName = getTempOnTable($1.label);
+				string infere_tipo = "";
+				if(varName == ""){
+					varName = getVarName();
+					variavel v = createVar($$.label, getVarType($3.tipo), varName);
+					varTable[v.nome_var] = v;
+
+					//se a variavel nao esta no mapa cria-se e seta o tipo
+					infere_tipo = getVarType($3.tipo) + " ";
+				}
+				$$.traducao = $1.traducao + $3.traducao+ "\t"+ infere_tipo + varName  +" = " + $3.label +";\n";
+				i++;
+				std::cout << "Estou em ATRIB " << i << ' ' << getVarType($0.tipo) << std::endl;
+				createLog("Name", getVarType($3.tipo) + " "+ $$.label + " - " + varName, appendLogFile);
+			}
+			;
+
 E 			: '('E')'{
 
 				$$ = $2;
@@ -178,6 +237,7 @@ E 			: '('E')'{
 				string linha = convertRelacional($1.tipo, $1.label, $3.tipo, $3.label);
 				string varName = getVarName();
 				$$.traducao = $1.traducao + $3.traducao + linha +"\t"+getVarType($$.tipo)+ " " + varName +" = "+ $1.label +" > "+ $3.label +";\n";
+				cout << getVarType($$.tipo) << endl;
 				$$.label = varName;
 			}
 			| E '<' E
@@ -292,7 +352,21 @@ int yyparse();
 int main( int argc, char* argv[] )
 {
 
+	//criar datamap em arquivo
+
+
+
+
 	yyparse();
+	// show content:
+	string linhas;
+	for (std::map<string,variavel>::iterator it=varTable.begin(); it!=varTable.end(); ++it){
+		variavel var = it->second;
+		linhas += var.tipo + " " + var.nome_var + " " + var.nome_temp + "\n";
+
+	}
+	createLog("varTable", linhas, false);
+
 
 	return 0;
 }
@@ -347,6 +421,7 @@ string convertRelacional(int t1, string t1_label, int t3, string t3_label){
 			linha = "\tfloat " + getVarName() + " = " + toFloat +";\n";
 		}
 	}
+	return linha;
 
 }
 
@@ -368,5 +443,26 @@ void createLog (string name, string toWrite, bool append){
 	fprintf(p_arquivo,"%s\n", toWrite.c_str());
 
 	fclose(p_arquivo);
+
+}
+
+variavel createVar(string nome_var, string tipo, string nome_temp){
+
+	variavel var;
+	var.tipo = tipo;
+	var.nome_var = nome_var;
+	var.nome_temp = nome_temp;
+
+	return var;
+}
+
+string getTempOnTable(string label){
+
+	if ( varTable.count(label) ){
+		//variavel ja foi declarada
+		return varTable[label].nome_temp;
+	}else{
+		return "";
+	}
 
 }
