@@ -1,5 +1,7 @@
 int main()
 {
-
-	 int a = 1, k, c = 2, b;
+	int a = 1 + 2;
+	b = 0 - 3.8;
+	float c = 4.2 * 5.1;
+	a = 4.2 / 2;
 }

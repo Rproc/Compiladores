@@ -911,12 +911,12 @@ YY_RULE_SETUP
 case 20:
 YY_RULE_SETUP
 #line 59 "lexica.l"
-{ yylval.label = yytext; return TK_BOOL;  }
+{ yylval.label = "1"; return TK_BOOL;  }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 60 "lexica.l"
-{ yylval.label = yytext; return TK_BOOL;  }
+{ yylval.label = "0"; return TK_BOOL;  }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP

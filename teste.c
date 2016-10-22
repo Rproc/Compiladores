@@ -5,9 +5,9 @@
 int main(int argc, char const *argv[]) {
 
     int temp1 = 6;
-    int temp2 = 5;
+    float temp2 = 5.5;
 
-    int temp3 = temp1 > temp2;
+    float temp3 = 3/2.0;
 
-    printf("%d\n", temp3);
+    printf("%f\n", temp3);
  }
