@@ -387,13 +387,13 @@ struct yy_trans_info
 static yyconst flex_int16_t yy_accept[78] =
     {   0,
         0,    0,   28,   26,    2,    1,   26,   26,    8,    9,
-        9,   20,   11,    9,   10,   21,   21,   21,   21,   21,
-       21,   21,   21,   21,   21,   21,    2,   16,    0,    0,
-        0,    0,   20,    0,   13,   14,   12,    0,   21,   21,
-       21,   21,   21,   21,   21,   21,   21,   21,   21,   18,
-       21,   23,   22,    0,   22,   17,   21,   21,   21,   21,
-       21,    4,   21,   19,   21,    7,    6,   21,   21,   21,
-        3,   21,   21,   21,    5,   15,    0
+        9,   22,   11,    9,   10,   24,   24,   24,   24,   24,
+       24,   24,   24,   24,   24,   24,    2,   16,    0,    0,
+        0,    0,   22,    0,   13,   14,   12,    0,   24,   24,
+       24,   24,   24,   24,   24,   24,   24,   24,   24,   18,
+       24,   23,   25,    0,   25,   17,   24,   24,   24,   24,
+       24,    4,   24,   19,   24,    7,    6,   24,   24,   24,
+        3,   20,   24,   21,    5,   15,    0
     } ;
 
 static yyconst YY_CHAR yy_ec[256] =
@@ -407,7 +407,7 @@ static yyconst YY_CHAR yy_ec[256] =
        12,   13,    1,    1,   14,   14,   14,   14,   14,   14,
        14,   14,   14,   14,   14,   14,   14,   14,   14,   14,
        14,   14,   14,   14,   14,   14,   14,   14,   14,   14,
-        6,    1,    6,    1,   14,    1,   15,   16,   17,   18,
+        6,    1,    6,    7,   14,    1,   15,   16,   17,   18,
 
        19,   20,   14,   21,   22,   14,   14,   23,   24,   25,
        26,   14,   27,   28,   29,   30,   31,   14,   14,   14,
@@ -911,41 +911,41 @@ YY_RULE_SETUP
 case 20:
 YY_RULE_SETUP
 #line 59 "lexica.l"
-{ yylval.label = yytext; return TK_NUM;  }
+{ yylval.label = "1"; return TK_BOOL;  }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 60 "lexica.l"
-{ yylval.label = yytext; return TK_ID;   }
+{ yylval.label = "0"; return TK_BOOL;  }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 61 "lexica.l"
-{ yylval.label = yytext; return TK_REAL; }
+#line 62 "lexica.l"
+{ yylval.label = yytext; return TK_NUM;  }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 62 "lexica.l"
+#line 63 "lexica.l"
 { yylval.label = yytext; return TK_CHAR; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 64 "lexica.l"
-{ yylval.label = yytext; return TK_BOOL;  }
+{ yylval.label = yytext; return TK_ID;   }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 65 "lexica.l"
-{ yylval.label = yytext; return TK_BOOL;  }
+{ yylval.label = yytext; return TK_REAL; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 67 "lexica.l"
+#line 68 "lexica.l"
 { *yytext; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 69 "lexica.l"
+#line 70 "lexica.l"
 ECHO;
 	YY_BREAK
 #line 952 "lex.yy.c"
@@ -1949,7 +1949,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 69 "lexica.l"
+#line 70 "lexica.l"
 
 
 

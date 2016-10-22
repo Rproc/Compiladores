@@ -56,8 +56,8 @@ ID {LETRA}({LETRA}|{NUM})*
 
 
 
-"true"      { yylval.label = yytext; return TK_BOOL;  }
-"false"     { yylval.label = yytext; return TK_BOOL;  }
+"true"      { yylval.label = "1"; return TK_BOOL;  }
+"false"     { yylval.label = "0"; return TK_BOOL;  }
 
 {NUM}		{ yylval.label = yytext; return TK_NUM;  }
 {CHAR}      { yylval.label = yytext; return TK_CHAR; }
