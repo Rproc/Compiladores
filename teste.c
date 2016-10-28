@@ -4,10 +4,7 @@
 
 int main(int argc, char const *argv[]) {
 
-    int temp1 = 6;
-    float temp2 = 5.5;
+    int a = (int)'a';
 
-    float temp3 = 3/2.0;
-
-    printf("%f\n", temp3);
- }
+    printf("%d\n", 'a');
+}

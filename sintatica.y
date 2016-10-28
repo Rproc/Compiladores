@@ -1,3 +1,5 @@
+//Mexer no BOOLEAN
+
 %{
 #include <iostream>
 #include <string>
@@ -46,6 +48,8 @@ variavel createVar(string, string, string);
 int getTokenType(string);
 int checkTypeArith(int, int);
 atributos castArith(atributos, atributos, string);
+atributos castFunctionArith(int, string, int, string, int, string);
+string declararVariaveis();
 int yylex(void);
 void yyerror(string);
 
@@ -63,6 +67,7 @@ string getVarName(){
 %token TK_FIM TK_ERROR
 %token TK_EQUAL TK_GTE TK_LTE TK_NEQUAL TK_MAIOR TK_MENOR
 %token TK_AND TK_OR TK_NOT
+%token TK_IF TK_WHILE
 
 %start S
 %left ')'
@@ -75,7 +80,7 @@ string getVarName(){
 
 S 			: TK_TIPO_INT TK_MAIN '(' ')' BLOCO
 			{
-				cout <<"\n\n/*Compilador Bolado*/\n" << "#include <iostream>\n#include <string.h>\n#include <stdio.h>\nint main(void)\n{\n" << $5.traducao << "\treturn 0;\n}" << endl;
+				cout <<"\n\n/*Compilador Bolado*/\n" << "#include <iostream>\n#include <string.h>\n#include <stdio.h>\nint main(void)\n{\n" << declararVariaveis() << $5.traducao << "\treturn 0;\n}" << endl;
 			}
 			;
 
@@ -138,7 +143,7 @@ TYPE		: TK_TIPO_INT
 VARLIST		: VARLIST ',' TK_ID
 			{
 				string varName = getVarName();
-				$$.traducao = $1.traducao + $3.traducao +"\t" + getVarType($0.tipo) + " "+ varName + "; \n";
+				$$.traducao = $1.traducao + $3.traducao;// +"\t" + getVarType($0.tipo) + " "+ varName + "; \n";
 				createLog("Name", getVarType($0.tipo) + " " + $3.label + " - " + varName, appendLogFile);
 				variavel v = createVar($3.label, getVarType($0.tipo), varName);
 				varTable[v.nome_var] = v;
@@ -150,6 +155,7 @@ VARLIST		: VARLIST ',' TK_ID
 			| ATRIB
 			{
 				$$.traducao = $1.traducao;
+				$$.tipo = $1.tipo;
 				i++;
 			}
 			|TK_ID
@@ -157,7 +163,7 @@ VARLIST		: VARLIST ',' TK_ID
 				// COLOCAR no HASH
 				string varName = getVarName();
 				$$.label = $1.label;
-				$$.traducao = $1.traducao + "\t" + getVarType($0.tipo)+ " "+ varName + "; \n";
+				$$.traducao = $1.traducao;// + "\t" + getVarType($0.tipo)+ " "+ varName + "; \n";
 				createLog("Name", getVarType($0.tipo) + " "+ $$.label + " - " + varName, appendLogFile);
 				variavel v = createVar($$.label, getVarType($0.tipo), varName);
 				std::cout << "Tipo " << getVarType($0.tipo) << " com i = "<< i<< std::endl;
@@ -171,29 +177,42 @@ ATRIB 		: TK_ID '=' E
 				string infere_tipo = "", store = "";
 				variavel v;
 
+				std::cout << "Tipo da Atrib"<< getVarType($0.tipo) << std::endl;
+
 				//variavel n existe na tabela
 				if(varName == ""){
 					varName = getVarName();
 
-					v = createVar($$.label, getVarType($3.tipo), varName);
-					infere_tipo = getVarType($3.tipo) + " ";
 
-					std::cout << "Tipo " << getVarType($0.tipo) << " com i = "<< i<< std::endl;
-					std::cout << "(VAR3) Tipo " << getVarType($3.tipo) << " com i = "<< i<< std::endl;
+					if(getVarType($0.tipo) == ""){
+						infere_tipo = getVarType($3.tipo);
+					}
+					else
+						infere_tipo = getVarType($0.tipo);
+
+
+					v = createVar($$.label, infere_tipo, varName);
+
+					// std::cout << "Tipo " << getVarType($0.tipo) << " com i = "<< i<< std::endl;
+					// std::cout << "(VAR3) Tipo " << getVarType($3.tipo) << " com i = "<< i<< std::endl;
 
 					varTable[v.nome_var] = v;
 
 				}
 				// Cast na atribuição com Temp "Store"
 				if( (varTable[$1.label].tipo != getVarType($3.tipo) ) ){
+					puts ("Cast Atrib");
 					store = getVarName();
 					string linha =  store + " = (" +varTable[$1.label].tipo+") " + $3.label + ";\n";
-					string linha2 = "\t" + varTable[$1.label].tipo + " " + varName + " = " + store + ";\n";
-					$$.traducao = $1.traducao + $3.traducao + "\t" + varTable[$1.label].tipo + " " + linha + linha2;
+					string linha2 = "\t"  + varName + " = " + store + ";\n";
+					$$.traducao = $1.traducao + $3.traducao + "\t"  + linha + linha2;
+
+					variavel v = createVar(store, infere_tipo,store);
+					varTable[store] = v;
 				}
 				// Tipo Inferido ou cast não necessário
 				else
-					$$.traducao = $1.traducao + $3.traducao+ "\t"+ infere_tipo + varName  + " = " + $3.label +";\n";
+					$$.traducao = $1.traducao + $3.traducao+ "\t"+ infere_tipo + ' '+ varName  + " = " + $3.label +";\n";
 
 				i++;
 				createLog("Name", getVarType($3.tipo) + " "+ $$.label + " - " + varName, appendLogFile);
@@ -208,7 +227,10 @@ E 			: '('E')'{
 				$$.tipo = $2.tipo;
 				string varName = getVarName();
 				$$.label = '-' + $2.label;
-				$$.traducao = $2.traducao + "\t"+getVarType($$.tipo)+ " " + varName +" = " + " - " + $2.label +";\n";
+				$$.traducao = $2.traducao + "\t" + varName +" = " + "-" + $2.label +";\n";
+				variavel v = createVar(varName, getVarType($$.tipo), varName);
+				varTable[varName] = v;
+
 			}
  			| E '+' E
 			{
@@ -303,32 +325,40 @@ E 			: '('E')'{
 			{
 				$$.tipo = TK_TIPO_FLOAT;
 				string varName = getVarName();
-				$$.traducao = "\t" + getVarType($$.tipo) + " "+varName+ " = " + $1.label + ";\n";
+				$$.traducao = "\t" +varName + " = " + $1.label + ";\n";
 				$$.label = varName;
+
+				variavel v = createVar(varName, getVarType($$.tipo), varName);
+				varTable[varName] = v;
 			}
 			| TK_NUM
 			{
 				$$.tipo = TK_TIPO_INT;
 				string varName = getVarName();
-				$$.traducao = "\t"+ getVarType($$.tipo) + " "+varName+ " = " + $1.label + ";\n";
+				$$.traducao = "\t" +varName + " = " + $1.label + ";\n";
 				$$.label = varName;
+				variavel v = createVar(varName, getVarType($$.tipo), varName);
+				varTable[varName] = v;
 			}
 			| TK_BOOL
 			{
 				$$.tipo = TK_TIPO_BOOL;
 				string varName = getVarName();
 				// puts("Estou aqui");
-				$$.traducao = "\t"+ getVarType($$.tipo) + " "+varName+ " = " + $1.label + ";\n";
+				$$.traducao = "\t" + varName+ " = " + $1.label + ";\n";
 				$$.label = varName;
+				variavel v = createVar(varName, getVarType($$.tipo), varName);
+				varTable[varName] = v;
 			}
 			| TK_CHAR
 			{
 				// puts("Estou aqui");
 				$$.tipo = TK_TIPO_CHAR;
 				string varName = getVarName();
-				$$.traducao = "\t" + getVarType($$.tipo) + " " + varName + " = " + $1.label + ";\n";
+				$$.traducao = "\t" + varName + " = " + $1.label + ";\n";
 				$$.label = varName;
-
+				variavel v = createVar(varName, getVarType($$.tipo), varName);
+				varTable[varName] = v;
 			}
 			| TK_ID
 			{
@@ -344,9 +374,6 @@ E 			: '('E')'{
 					$$.traducao = $1.traducao;
 					$$.label = id;
 					$$.tipo = getTokenType(varTable[$1.label].tipo);
-					std::cout << "Traducao do ID " << $$.traducao << " com i = " << i <<std::endl;
-					// std::cout << "Label do ID " << $$.label << " com i = " << i <<std::endl;
-
 				}
 			}
 			;
@@ -366,13 +393,25 @@ int main( int argc, char* argv[] )
 	string linhas;
 	for (std::map<string,variavel>::iterator it=varTable.begin(); it!=varTable.end(); ++it){
 		variavel var = it->second;
-		linhas += var.tipo + " " + var.nome_var + " " + var.nome_temp + "\n";
+		linhas += var.tipo + "\t" + var.nome_var + "\t" + var.nome_temp + "\n";
 
 	}
 	createLog("varTable", linhas, false);
 
 
 	return 0;
+}
+
+string declararVariaveis(){
+
+	string linhas;
+	for (std::map<string,variavel>::iterator it=varTable.begin(); it!=varTable.end(); ++it){
+		variavel var = it->second;
+		linhas += "\t" + var.tipo + ' ' + var.nome_temp + ";\n";
+
+	}
+	linhas += "\n";
+	return linhas;
 }
 
 void yyerror( string MSG )
@@ -412,6 +451,9 @@ int checkType (int t1, int t3){
 		if (t1 == TK_TIPO_BOOL && t3 == TK_TIPO_BOOL)
 			return TK_TIPO_BOOL;
 
+		else if (t1 == TK_TIPO_CHAR && t3 == TK_TIPO_CHAR)
+			return TK_TIPO_CHAR;
+
 		puts("Invalid Type for the Operation");
 		//exit(0);
 	}
@@ -431,16 +473,59 @@ atributos castFunction(int t1, string t1_label, int t3, string t3_label, int t0,
 	string linha = "", linha2 = "";
 
 	string varName = getVarName();
-	string store = getVarName();
+	atributos retorno;
+
 	if (teste == TK_TIPO_FLOAT){
 
+		string store = getVarName();
+		retorno.label = store;
+
+		variavel v = createVar(varName, getVarType(teste), varName);
+		varTable[varName] = v;
+		v = createVar(store, getVarType(teste), store);
+		varTable[store] = v;
+
 		if(t1 == TK_TIPO_INT){
-			linha = "\tfloat " + varName + " = (float) " + t1_label +";\n";
-			linha2 = "\t"+getVarType(t0)+ " " + store +" = "+ varName + " " + sinal + " " +t3_label +";\n";
+			linha = "\t" + varName + " = (float) " + t1_label +";\n";
+			linha2 = "\t" + store +" = "+ varName + " " + sinal + " " +t3_label +";\n";
 		}
 		else if (t3 == TK_TIPO_INT){
 			linha = "\tfloat " + varName + " = (float) " + t3_label +";\n";
-			linha2 = "\t"+getVarType(t0)+ " " + store +" = "+ t1_label + " " + sinal + " " + varName +";\n";
+			linha2 = "\t" + store +" = "+ t1_label + " " + sinal + " " + varName +";\n";
+		}
+	}
+	else if (teste == TK_TIPO_INT){
+
+		linha2 = "\t" + varName +" = "+ t1_label + " " + sinal + " " + t3_label +";\n";
+		variavel v = createVar(varName, getVarType(teste), varName);
+		varTable[varName] = v;
+	}
+
+	retorno.traducao = linha + linha2;
+	retorno.tipo = t0;
+	return retorno;
+
+}
+atributos castFunctionArith(int t1, string t1_label, int t3, string t3_label, int t0, string sinal){
+	int teste = checkType(t1, t3);
+	string linha = "", linha2 = "";
+
+	string varName = getVarName();
+	string store = getVarName();
+	if (teste == TK_TIPO_FLOAT){
+
+		variavel v = createVar(varName, getVarType(teste), varName);
+		varTable[varName] = v;
+		v = createVar(store, getVarType(teste), store);
+		varTable[store] = v;
+
+		if(t1 == TK_TIPO_INT){
+			linha = "\t" + varName + " = (float) " + t1_label +";\n";
+			linha2 = "\t" + store +" = "+ varName + " " + sinal + " " +t3_label +";\n";
+		}
+		else if (t3 == TK_TIPO_INT){
+			linha = "\t" + varName + " = (float) " + t3_label +";\n";
+			linha2 = "\t" + store +" = "+ t1_label + " " + sinal + " " + varName +";\n";
 		}
 	}
 	atributos retorno;
@@ -509,13 +594,18 @@ atributos castArith(atributos s1, atributos s3, string sinal){
 
 	atributos ss;
 	ss.tipo = checkTypeArith(s1.tipo, s3.tipo);
+	//Sem Cast
 	if (s1.tipo == s3.tipo){
 		string varName = getVarName();
-		ss.traducao = s1.traducao + s3.traducao + "\t"+getVarType(ss.tipo)+ " " + varName + " = "+ s1.label +" " + sinal + " "+ s3.label +";\n";
+		ss.traducao = s1.traducao + s3.traducao + "\t" + varName + " = "+ s1.label +" " + sinal + " "+ s3.label +";\n";
 		ss.label = varName;
+
+		variavel v = createVar(varName, getVarType(ss.tipo), varName);
+		varTable[varName] = v;
 	}
+	//Com cast
 	else{
-		atributos atr = castFunction(s1.tipo, s1.label, s3.tipo, s3.label, ss.tipo, sinal);
+		atributos atr = castFunctionArith(s1.tipo, s1.label, s3.tipo, s3.label, ss.tipo, sinal);
 		ss.traducao = s1.traducao + s3.traducao + atr.traducao;
 		ss.label = atr.label;
 	}

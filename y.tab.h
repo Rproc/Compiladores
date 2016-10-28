@@ -65,7 +65,9 @@ extern int yydebug;
     TK_MENOR = 275,
     TK_AND = 276,
     TK_OR = 277,
-    TK_NOT = 278
+    TK_NOT = 278,
+    TK_IF = 279,
+    TK_WHILE = 280
   };
 #endif
 /* Tokens.  */
@@ -90,6 +92,8 @@ extern int yydebug;
 #define TK_AND 276
 #define TK_OR 277
 #define TK_NOT 278
+#define TK_IF 279
+#define TK_WHILE 280
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
