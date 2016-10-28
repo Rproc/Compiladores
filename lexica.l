@@ -54,6 +54,10 @@ ID {LETRA}({LETRA}|{NUM})*
 
 "not"       { return TK_NOT; }
 
+"if"        { return TK_IF; }
+
+"while"     { return TK_WHILE; }
+
 
 
 "true"      { yylval.label = "1"; return TK_BOOL;  }
