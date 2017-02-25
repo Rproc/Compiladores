@@ -255,7 +255,7 @@ COMANDO 	: E ';'
 			 }
 			| TK_BREAK_FUNC ';' {
 			 	
-			 	cout << "Break func " << $1.label << " parametro " << getNumber($1.label) << endl;
+			 	//cout << "Break func " << $1.label << " parametro " << getNumber($1.label) << endl;
 			 	$$.traducao = $1.traducao;
 			 
 			 	int parametro_break = getNumber($1.label);
@@ -715,7 +715,7 @@ DO			: TK_DO BLOCO TK_WHILE '(' E ')' ';'
 			
 FOR:		TK_FOR '(' DECLARATION ';' E ';' ATRIB ')' BLOCO
 			{
-				cout << "ENCONTREI UM FOR " << getVarType($5.tipo) <<" : " << $5.tipo <<endl;
+				//cout << "ENCONTREI UM FOR " << getVarType($5.tipo) <<" : " << $5.tipo <<endl;
 				
 				if( $5.tipo != TK_TIPO_BOOL ){
 					cout <<  "ERRO DE COMPILACAO: for espera uma expressao boleana no segundo parametro" <<endl;
@@ -748,7 +748,7 @@ FOR:		TK_FOR '(' DECLARATION ';' E ';' ATRIB ')' BLOCO
 			|
 			TK_FOR '(' DECLARATION ';' E ';' OPERADOR_UNARIO ')' BLOCO
 			{
-				cout << "ENCONTREI UM FOR " << getVarType($5.tipo) <<" : " << $5.tipo <<endl;
+				//cout << "ENCONTREI UM FOR " << getVarType($5.tipo) <<" : " << $5.tipo <<endl;
 				
 				if( $5.tipo != TK_TIPO_BOOL ){
 					cout <<  "ERRO DE COMPILACAO: for espera uma expressao boleana no segundo parametro" <<endl;
@@ -781,7 +781,7 @@ FOR:		TK_FOR '(' DECLARATION ';' E ';' ATRIB ')' BLOCO
 			|			
 			TK_FOR '(' DECLARATION ';' E ';' OPERADOR_COMPOSTO ')' BLOCO
 			{
-				cout << "ENCONTREI UM FOR " << getVarType($5.tipo) <<" : " << $5.tipo <<endl;
+				//cout << "ENCONTREI UM FOR " << getVarType($5.tipo) <<" : " << $5.tipo <<endl;
 				
 				if( $5.tipo != TK_TIPO_BOOL ){
 					cout <<  "ERRO DE COMPILACAO: for espera uma expressao boleana no segundo parametro" <<endl;
@@ -838,7 +838,7 @@ PUSH_LOOP: {
 POP_LOOP:	{
 				popLoop(pilhaLoops);
 				
-				cout << "Popando o Loop While" << endl;
+				//cout << "Popando o Loop While" << endl;
 
 				
 				$$.traducao = "";
@@ -1041,7 +1041,7 @@ ATRIB 		: TK_ID '=' E
 				variavel var = getVarOnStack($1.label); //Buscar só no escopo atual
 				string varName = var.nome_temp;
 				
-				cout << $3.label <<" tam da E em atrib "<< $3.tamanho << endl;
+				//cout << $3.label <<" tam da E em atrib "<< $3.tamanho << endl;
 
 				string infere_tipo = "", store = "";
 				
@@ -1091,7 +1091,7 @@ ATRIB 		: TK_ID '=' E
 					
 				}else{
 					//se a variavel ja foi declarada
-					cout << " VARIAVEL FOI DECLARADA "<< var.tipo << endl;
+					//cout << " VARIAVEL FOI DECLARADA "<< var.tipo << endl;
 					if(var.tipo == getVarType(TK_TIPO_STRING)){
 						string willy = getVarName();					
 						variavel willy_var = createVar(willy, var.tipo, willy);
@@ -1105,7 +1105,7 @@ ATRIB 		: TK_ID '=' E
 						trad +=  "\tstrcpy(" + varName  + ", " + $3.label +");\n";
 						trad += "\tfree("+ willy + ");\n";
 						
-						cout << " TRAD EM ATRIB " <<trad << endl;
+						//cout << " TRAD EM ATRIB " <<trad << endl;
 						
 						//atualiza o tamanho da variavel existente e salva na pilha
 						var.tamanho = tam;
@@ -1318,8 +1318,8 @@ E 			: '('E')'{
 				// nao conta o abre e fecha aspas
 				v.tamanho = $1.label.size() - 2;
 				
-				cout << "Imprimindo Label: " << $1.label <<endl;
-				cout<< " tamanho da string " << v.tamanho << endl;
+				//cout << "Imprimindo Label: " << $1.label <<endl;
+				//cout<< " tamanho da string " << v.tamanho << endl;
 				
 				addVar2Escopo(pilha, v);
 				declaracoes.push_back(v);
@@ -1340,7 +1340,7 @@ E 			: '('E')'{
 					$$.tipo = getTokenType(v.tipo);
 					$$.tamanho = v.tamanho;
 					
-					cout << " achei uma variavel "<< v.nome_var << " " << v.nome_temp << " " << v.tamanho << endl;
+					//cout << " achei uma variavel "<< v.nome_var << " " << v.nome_temp << " " << v.tamanho << endl;
 				//	cout << "REGRA TK_ID: " <<$$.label << $$.tipo <<": "+v.tipo << endl;
 				}
 			}
@@ -1362,7 +1362,7 @@ E 			: '('E')'{
 					$$.tipo = getTokenType(v.tipo);
 					$$.tamanho = v.tamanho;
 					
-					cout << " achei uma variavel "<< v.nome_var << " " << v.nome_temp << " " << v.tamanho << endl;
+					//cout << " achei uma variavel "<< v.nome_var << " " << v.nome_temp << " " << v.tamanho << endl;
 				//	cout << "REGRA TK_ID: " <<$$.label << $$.tipo <<": "+v.tipo << endl;
 				}
 			}
@@ -1526,7 +1526,7 @@ int checkTypeArith(int t1, int t3){
 	if ( (t1 != TK_TIPO_INT && t1 != TK_TIPO_FLOAT) || (t3 != TK_TIPO_INT && t3 != TK_TIPO_FLOAT) ) {
 		puts("Invalid Types for Arithmetics Operators!");
 
-		cout << "TIPOS DE T1 E T3 " << t1 << " " << t3 << endl;
+		//cout << "TIPOS DE T1 E T3 " << t1 << " " << t3 << endl;
 		exit(0);
 
 	}
@@ -1668,10 +1668,10 @@ atributos concatString (atributos a1 ,atributos a2){
 	
 	var.tamanho = a1.tamanho + a2.tamanho;
 	
-	cout << "VarTamanho " << v1.tamanho << " " << v2.tamanho << endl;
-	cout << "dados variaveis encontradas" <<endl;
-	cout << v1.nome_temp << " " << v1.nome_var << endl;
-	cout << v2.nome_temp << " " << v2.nome_var << endl;
+	//cout << "VarTamanho " << v1.tamanho << " " << v2.tamanho << endl;
+	//cout << "dados variaveis encontradas" <<endl;
+	//cout << v1.nome_temp << " " << v1.nome_var << endl;
+	//cout << v2.nome_temp << " " << v2.nome_var << endl;
 	
 	declaracoes.push_back(var);
 	
