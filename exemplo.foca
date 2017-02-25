@@ -1,4 +1,10 @@
+
 int main()
 {
-	int a = 'a';
+  a =3;
+  b = 'a';
+  
+  
+  c = a + b;
+  
 }

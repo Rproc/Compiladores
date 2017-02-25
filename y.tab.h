@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.0.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -49,25 +49,39 @@ extern int yydebug;
     TK_REAL = 259,
     TK_CHAR = 260,
     TK_BOOL = 261,
-    TK_MAIN = 262,
-    TK_ID = 263,
-    TK_TIPO_INT = 264,
-    TK_TIPO_FLOAT = 265,
-    TK_TIPO_CHAR = 266,
-    TK_TIPO_BOOL = 267,
-    TK_FIM = 268,
-    TK_ERROR = 269,
-    TK_EQUAL = 270,
-    TK_GTE = 271,
-    TK_LTE = 272,
-    TK_NEQUAL = 273,
-    TK_MAIOR = 274,
-    TK_MENOR = 275,
-    TK_AND = 276,
-    TK_OR = 277,
-    TK_NOT = 278,
-    TK_IF = 279,
-    TK_WHILE = 280
+    TK_STRING = 262,
+    TK_GLOBAL = 263,
+    TK_MAIN = 264,
+    TK_ID = 265,
+    TK_TIPO_INT = 266,
+    TK_TIPO_FLOAT = 267,
+    TK_TIPO_CHAR = 268,
+    TK_TIPO_BOOL = 269,
+    TK_TIPO_STRING = 270,
+    TK_FIM = 271,
+    TK_ERROR = 272,
+    TK_EQUAL = 273,
+    TK_GTE = 274,
+    TK_LTE = 275,
+    TK_NEQUAL = 276,
+    TK_MAIOR = 277,
+    TK_MENOR = 278,
+    TK_AND = 279,
+    TK_OR = 280,
+    TK_NOT = 281,
+    TK_IF = 282,
+    TK_WHILE = 283,
+    TK_DO = 284,
+    TK_FOR = 285,
+    TK_ELSE = 286,
+    TK_BREAK = 287,
+    TK_BREAK_ALL = 288,
+    TK_BREAK_FUNC = 289,
+    TK_CONTINUE = 290,
+    TK_PRINT = 291,
+    TK_READ = 292,
+    TK_PP = 293,
+    TK_MM = 294
   };
 #endif
 /* Tokens.  */
@@ -75,25 +89,39 @@ extern int yydebug;
 #define TK_REAL 259
 #define TK_CHAR 260
 #define TK_BOOL 261
-#define TK_MAIN 262
-#define TK_ID 263
-#define TK_TIPO_INT 264
-#define TK_TIPO_FLOAT 265
-#define TK_TIPO_CHAR 266
-#define TK_TIPO_BOOL 267
-#define TK_FIM 268
-#define TK_ERROR 269
-#define TK_EQUAL 270
-#define TK_GTE 271
-#define TK_LTE 272
-#define TK_NEQUAL 273
-#define TK_MAIOR 274
-#define TK_MENOR 275
-#define TK_AND 276
-#define TK_OR 277
-#define TK_NOT 278
-#define TK_IF 279
-#define TK_WHILE 280
+#define TK_STRING 262
+#define TK_GLOBAL 263
+#define TK_MAIN 264
+#define TK_ID 265
+#define TK_TIPO_INT 266
+#define TK_TIPO_FLOAT 267
+#define TK_TIPO_CHAR 268
+#define TK_TIPO_BOOL 269
+#define TK_TIPO_STRING 270
+#define TK_FIM 271
+#define TK_ERROR 272
+#define TK_EQUAL 273
+#define TK_GTE 274
+#define TK_LTE 275
+#define TK_NEQUAL 276
+#define TK_MAIOR 277
+#define TK_MENOR 278
+#define TK_AND 279
+#define TK_OR 280
+#define TK_NOT 281
+#define TK_IF 282
+#define TK_WHILE 283
+#define TK_DO 284
+#define TK_FOR 285
+#define TK_ELSE 286
+#define TK_BREAK 287
+#define TK_BREAK_ALL 288
+#define TK_BREAK_FUNC 289
+#define TK_CONTINUE 290
+#define TK_PRINT 291
+#define TK_READ 292
+#define TK_PP 293
+#define TK_MM 294
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
